@@ -14,64 +14,76 @@ npm install twitter-node-client
 var Twitter = require('twitter-node-client').Twitter;
 ```
 ## Usage
-You need to create a [Twitter app](https://dev.twitter.com/apps) to use the API. 
+You need to create a [Twitter app](https://dev.twitter.com/apps) to use the API.
 
+Rather than embedding the private twitter configuration data in your app
+you may prefer to to set up the config as environment variables and read
+it into the app from process.env (as shown in the example below).
+
+##### run_twitter_example
+```bash
+    #!/bin/bash
+    # Get this data from your twitter apps dashboard.
+    export TWITTER_CONSUMER_KEY='XXX'
+    export TWITTER_CONSUMER_SECRET='XXX'
+    export TWITTER_ACCESS_TOKEN='XXX'
+    export TWITTER_ACCESS_TOKEN_SECRET='XXX'
+    export TWITTER_CALLBACK_URL='XXX'
+    node twitter_example.js
+```
+
+##### twitter_example.js
 ```javascript
-	//Callback functions
-	var error = function (err, response, body) {
-    	console.log('ERROR [%s]', err);
-	};
-	var success = function (data) {
-    	console.log('Data [%s]', data);
-	};
+    // Callback functions
+    var error = function (err, response, body) {
+        console.log('ERROR [%s]', err);
+    };
+    var success = function (data) {
+        console.log('Data [%s]', data);
+    };
 
-	var Twitter = require('twitter-node-client').Twitter;
+    var Twitter = require('twitter-node-client').Twitter;
 
-	//Get this data from your twitter apps dashboard
-	{
-    	"consumerKey": "XXX",
-    	"consumerSecret": "XXX",
-    	"accessToken": "XXX",
-    	"accessTokenSecret": "XXX",
-    	"callBackUrl": "XXX"
-	}
-
-	// make a directory in the root folder of your project called data
-	// copy the node_modules/twitter-node-client/twitter_config file over into data/twitter_config`
-	// Open `data/twitter_config` and supply your applications `consumerKey`, 'consumerSecret', 'accessToken', 'accessTokenSecret', 'callBackUrl' to the appropriate fields in your data/twitter_config file
+    config = {
+        consumerKey: process.env.TWITTER_CONSUMER_KEY,
+        consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+        accessToken: process.env.TWITTER_ACCESS_TOKEN,
+        accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+        callBackUrl: process.env.TWITTER_CALLBACK_URL
+    }
     
-    var twitter = new Twitter();
-	
-	//Example calls
+    var twitter = new Twitter(config);
+    
+    //Example calls
 
-	twitter.getUserTimeline({ screen_name: 'BoyCook', count: '10'}, error, success);
-	
-	twitter.getMentionsTimeline({ count: '10'}, error, success);
-	
-	twitter.getHomeTimeline({ count: '10'}, error, success);
-	
-	twitter.getReTweetsOfMe({ count: '10'}, error, success);
-	
-	twitter.getTweet({ id: '1111111111'}, error, success);
+    twitter.getUserTimeline({ screen_name: 'BoyCook', count: '10'}, error, success);
+    
+    twitter.getMentionsTimeline({ count: '10'}, error, success);
+    
+    twitter.getHomeTimeline({ count: '10'}, error, success);
+    
+    twitter.getReTweetsOfMe({ count: '10'}, error, success);
+    
+    twitter.getTweet({ id: '1111111111'}, error, success);
 
-	
-	//
-	// Get 10 tweets containing the hashtag haiku
-	//
+    
+    //
+    // Get 10 tweets containing the hashtag haiku
+    //
 
-	twitter.getSearch({'q':'#haiku','count': 10}, error, success);
-	
-	//
-	// Get 10 popular tweets with a positive attitude about a movie that is not scary 
-	//
+    twitter.getSearch({'q':'#haiku','count': 10}, error, success);
+    
+    //
+    // Get 10 popular tweets with a positive attitude about a movie that is not scary 
+    //
 
-	twitter.getSearch({'q':' movie -scary :) since:2013-12-27', 'count': 10, 'result\_type':'popular'}, error, success);
+    twitter.getSearch({'q':' movie -scary :) since:2013-12-27', 'count': 10, 'result\_type':'popular'}, error, success);
 ```
 
 Twitter has a comprehensive [REST api](https://dev.twitter.com/rest/public) if you need to use something that doesn't have a wrapper function in the library call it directly : 
 ```javascript
-	twitter.getCustomApiCall('/statuses/lookup.json',{ id: '412312323'}, error, success);
-	twitter.postCustomApiCall('/direct_messages/new.json',{user_id: '1234', 'text':'This is easy.'}, error, success);
+    twitter.getCustomApiCall('/statuses/lookup.json',{ id: '412312323'}, error, success);
+    twitter.postCustomApiCall('/direct_messages/new.json',{user_id: '1234', 'text':'This is easy.'}, error, success);
 ```
 To get the list of expected parameters and results, check [https://dev.twitter.com/rest/public](https://dev.twitter.com/rest/public)
 
@@ -80,74 +92,74 @@ To get the list of expected parameters and results, check [https://dev.twitter.c
 ##### Search Tweets. [Docs](https://dev.twitter.com/rest/reference/get/search/tweets)
 To learn how to use Twitter Search effectively read [Using the Twitter Search API](https://dev.twitter.com/rest/public/search)
 ```javascript	
-	twitter.getSearch(parameters, errorCallback, successCallback);
+    twitter.getSearch(parameters, errorCallback, successCallback);
 ```
 &nbsp;
 
 ##### Update user's status (Tweet). [Docs](https://dev.twitter.com/rest/reference/post/statuses/update)
 ```javascript
-	twitter.postTweet(parameters, errorCallback, successCallback);
+    twitter.postTweet(parameters, errorCallback, successCallback);
 ```
 &nbsp;
 
 ##### Follow another user by user\_id or screen_name(handle). [Docs](https://dev.twitter.com/rest/reference/post/friendships/create)
 ```javascript
-	twitter.postCreateFriendship(parameters, errorCallback, successCallback);
+    twitter.postCreateFriendship(parameters, errorCallback, successCallback);
 ```
 
 &nbsp;
 
 ##### Get a user's timeline[Docs](https://dev.twitter.com/rest/reference/get/statuses/user_timeline)
 ```javascript
-	twitter.getUserTimeline(parameters, errorCallback, successCallback);
+    twitter.getUserTimeline(parameters, errorCallback, successCallback);
 ```
 &nbsp;
 
 ##### Get the latest 20 recent mentions for the authenticating user. [Docs](https://dev.twitter.com/rest/reference/get/statuses/mentions_timeline)
 ```javascript
-	twitter.getMentionsTimeline(parameters, errorCallback, successCallback);
+    twitter.getMentionsTimeline(parameters, errorCallback, successCallback);
 ```
 &nbsp;
 
 ##### Get the latest tweets and retweets by the authenticating users and the ones they follow. [Docs](https://dev.twitter.com/rest/reference/get/statuses/home_timeline)
 ```javascript
-	twitter.getHomeTimeline(parameters, errorCallback, successCallback);
+    twitter.getHomeTimeline(parameters, errorCallback, successCallback);
 ```
 &nbsp;
 
 ##### Get latest retweets of authenticated user. [Docs](https://dev.twitter.com/rest/reference/get/statuses/retweets_of_me)
 ```javascript
-	twitter.getReTweetsOfMe(parameters, errorCallback, successCallback);
+    twitter.getReTweetsOfMe(parameters, errorCallback, successCallback);
 ```
 &nbsp;
 
 ##### Get a tweet by id. [Docs](https://dev.twitter.com/rest/reference/get/statuses/show/)
 ```javascript
-	twitter.getTweet(parameters, errorCallback, successCallback);
+    twitter.getTweet(parameters, errorCallback, successCallback);
 ```
 &nbsp;
 
 ##### Get information about a user by user\_id or handle (screen_name). [Docs](https://dev.twitter.com/rest/reference/get/users/show)
 ```javascript
-	twitter.getUser(parameters, errorCallback, successCallback);
+    twitter.getUser(parameters, errorCallback, successCallback);
 ```
 &nbsp;
 
 ##### Get a cursored collection of the followers of a user\_id or a handle (screen_name). [Docs](https://dev.twitter.com/rest/reference/get/followers/list)
 ```javascript
-	twitter.getFollowersList(parameters, errorCallback, successCallback);
+    twitter.getFollowersList(parameters, errorCallback, successCallback);
 ```
 &nbsp;
 
 ##### Get a cursored collection of the followers' *ids* of a user\_id or a handle (screen_name). [Docs](https://dev.twitter.com/rest/reference/get/followers/ids)
 ```javascript
-	twitter.getFollowersIds(parameters, errorCallback, successCallbackok);
+    twitter.getFollowersIds(parameters, errorCallback, successCallbackok);
 ```
 &nbsp;
 
 ##### Upload media (images) to Twitter. [Docs](https://dev.twitter.com/rest/reference/post/media/upload)
 ```javascript
-	twitter.postMedia(parameters, errorCallback, successCallback);
+    twitter.postMedia(parameters, errorCallback, successCallback);
 ```
 
 ## Tests
@@ -158,4 +170,4 @@ These will need to be updated with your own details before the tests will run
 
 ## Running tests
 
-	make test
+    make test
